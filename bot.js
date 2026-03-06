@@ -13,17 +13,19 @@ client.once("clientReady", () => {
 });
 
 client.on("guildMemberAdd", async (member) => {
+  console.log(`New member joined: ${member.user.tag}`);
+
   try {
 
-    // give the Pending role
-    await member.roles.add("1479241671395901501");
-
-    // find the welcome channel
+    // GET WELCOME CHANNEL (by name)
     const welcomeChannel = member.guild.channels.cache.find(
       channel => channel.name === "welcome👋"
     );
 
-    if (!welcomeChannel) return;
+    if (!welcomeChannel) {
+      console.log("Welcome channel not found");
+      return;
+    }
 
     const formLink =
       `https://rn9klegl44q.typeform.com/to/pgROQxLr?discord_id=${member.id}`;
@@ -33,9 +35,9 @@ client.on("guildMemberAdd", async (member) => {
 
 Welcome to our discord community. To access our free content including:
 
-✅ Live Trading  
-✅ Alerts + Signals  
-✅ Free Course Content  
+✅ Live Trading
+✅ Alerts + Signals
+✅ Free Course Content
 ✅ And More!
 
 Please fill out this onboarding form so we know exactly how to tailor your experience so you get REAL results in our community.
@@ -46,6 +48,12 @@ We actually care about your success and you should too. So take 30 seconds to fi
 
 ${formLink}`
     );
+
+    console.log("Welcome message sent");
+
+    // GIVE PENDING ROLE
+    await member.roles.add("1479241671395901501");
+    console.log("Pending role added");
 
   } catch (error) {
     console.error("guildMemberAdd error:", error);
@@ -58,6 +66,7 @@ app.get("/", (req, res) => {
 
 app.post("/typeform", async (req, res) => {
   try {
+
     console.log("Incoming body:", JSON.stringify(req.body, null, 2));
 
     const discordId =
@@ -71,25 +80,25 @@ app.post("/typeform", async (req, res) => {
     }
 
     const guild = client.guilds.cache.get("929823996134957148");
-    console.log("Guild found:", !!guild);
 
     if (!guild) {
       return res.status(500).send("Guild not found. Make sure the bot is in the server.");
     }
 
     const member = await guild.members.fetch(String(discordId));
+
     console.log("Member found:", member.user.tag);
 
     await member.roles.remove("1479241671395901501");
-    console.log("Removed pending role");
+    console.log("Pending role removed");
 
     await member.roles.add("1074167210618126357");
-    console.log("Added free member role");
+    console.log("Free Member role added");
 
     return res.status(200).send("Roles updated");
+
   } catch (error) {
-    console.error("Webhook error full object:", error);
-    console.error("Webhook error message:", error.message);
+    console.error("Webhook error:", error);
     return res.status(500).send(`Server error: ${error.message}`);
   }
 });
@@ -98,6 +107,7 @@ const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, async () => {
   console.log(`Server running on port ${PORT}`);
+
   try {
     await client.login(process.env.BOT_TOKEN);
   } catch (error) {
