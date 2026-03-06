@@ -10,7 +10,13 @@ const client = new Client({
 
 client.once("clientReady", () => {
   console.log(`Logged in as ${client.user.tag}`);
+  console.log(
+    "Connected guilds:",
+    client.guilds.cache.map(g => `${g.name} (${g.id})`).join(", ")
+  );
 });
+
+console.log("guildMemberAdd listener loaded");
 
 client.on("guildMemberAdd", async (member) => {
   console.log(`New member joined: ${member.user.tag}`);
@@ -23,7 +29,8 @@ client.on("guildMemberAdd", async (member) => {
       return;
     }
 
-    const formLink = `https://rn9klegl44q.typeform.com/to/pgROQxLr?discord_id=${member.id}`;
+    const formLink =
+      `https://rn9klegl44q.typeform.com/to/pgROQxLr?discord_id=${member.id}`;
 
     await welcomeChannel.send(
 `Hey ${member}!
@@ -48,6 +55,7 @@ ${formLink}`
 
     await member.roles.add("1479241671395901501");
     console.log("Pending role added");
+
   } catch (error) {
     console.error("guildMemberAdd error:", error);
   }
@@ -59,6 +67,7 @@ app.get("/", (req, res) => {
 
 app.post("/typeform", async (req, res) => {
   try {
+
     console.log("Incoming body:", JSON.stringify(req.body, null, 2));
 
     const discordId =
@@ -87,6 +96,7 @@ app.post("/typeform", async (req, res) => {
     console.log("Free Member role added");
 
     return res.status(200).send("Roles updated");
+
   } catch (error) {
     console.error("Webhook error:", error);
     return res.status(500).send(`Server error: ${error.message}`);
