@@ -28,16 +28,16 @@ app.post("/typeform", async (req, res) => {
       return res.status(400).send("Missing discord_id");
     }
 
-    const guild = client.guilds.cache.get(929823996134957148);
+    const guild = client.guilds.cache.get("929823996134957148");
 
     if (!guild) {
       return res.status(500).send("Guild not found. Make sure the bot is in the server.");
     }
 
-    const member = await guild.members.fetch(discordId);
+    const member = await guild.members.fetch(String(discordId));
 
-    await member.roles.remove(1479241671395901501);
-    await member.roles.add(1074167210618126357);
+    await member.roles.remove("1479241671395901501");
+    await member.roles.add("1074167210618126357");
 
     return res.status(200).send("Roles updated");
   } catch (error) {
