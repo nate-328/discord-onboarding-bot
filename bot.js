@@ -12,35 +12,48 @@ client.once("ready", () => {
   console.log(`Logged in as ${client.user.tag}`);
 });
 
-client.login(process.env.BOT_TOKEN);
+app.get("/", (req, res) => {
+  res.status(200).send("Bot is running");
+});
 
 app.post("/typeform", async (req, res) => {
   try {
-    const discordId = req.body.discord_id;
+    console.log("Incoming body:", JSON.stringify(req.body, null, 2));
+
+    const discordId =
+      req.body.discord_id ||
+      req.body.form_response?.hidden?.discord_id;
 
     if (!discordId) {
       return res.status(400).send("Missing discord_id");
     }
 
-    const guild = await client.guilds.fetch(929823996134957148); // 
+    const guild = client.guilds.cache.get(929823996134957148);
+
+    if (!guild) {
+      return res.status(500).send("Guild not found. Make sure the bot is in the server.");
+    }
 
     const member = await guild.members.fetch(discordId);
 
-    await member.roles.remove(1479241671395901501); // 
-    await member.roles.add(1074167210618126357); // 
+    await member.roles.remove(1479241671395901501);
+    await member.roles.add(1074167210618126357);
 
     return res.status(200).send("Roles updated");
   } catch (error) {
-    console.error(error);
-    return res.status(500).send("Server error");
+    console.error("Webhook error:", error);
+    return res.status(500).send(`Server error: ${error.message}`);
   }
 });
 
 const PORT = process.env.PORT || 3000;
 
-app.get("/", (req, res) => {
-  res.status(200).send("Bot is running");
-});
+app.listen(PORT, async () => {
   console.log(`Server running on port ${PORT}`);
-
+  try {
+    await client.login(process.env.BOT_TOKEN);
+  } catch (error) {
+    console.error("Login failed:", error);
+    process.exit(1);
+  }
 });
