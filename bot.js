@@ -12,6 +12,46 @@ client.once("clientReady", () => {
   console.log(`Logged in as ${client.user.tag}`);
 });
 
+client.on("guildMemberAdd", async (member) => {
+  try {
+
+    // give the Pending role
+    await member.roles.add("1479241671395901501");
+
+    // find the welcome channel
+    const welcomeChannel = member.guild.channels.cache.find(
+      channel => channel.name === "welcome👋"
+    );
+
+    if (!welcomeChannel) return;
+
+    const formLink =
+      `https://rn9klegl44q.typeform.com/to/pgROQxLr?discord_id=${member.id}`;
+
+    await welcomeChannel.send(
+`Hey ${member}!
+
+Welcome to our discord community. To access our free content including:
+
+✅ Live Trading  
+✅ Alerts + Signals  
+✅ Free Course Content  
+✅ And More!
+
+Please fill out this onboarding form so we know exactly how to tailor your experience so you get REAL results in our community.
+
+We actually care about your success and you should too. So take 30 seconds to fill out this form and you will gain INSTANT access to all of our resources.
+
+- Tristan
+
+${formLink}`
+    );
+
+  } catch (error) {
+    console.error("guildMemberAdd error:", error);
+  }
+});
+
 app.get("/", (req, res) => {
   res.status(200).send("Bot is running");
 });
